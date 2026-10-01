@@ -1,0 +1,23 @@
+:host { display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.between { justify-content: space-between; }
+dl { display: grid; gap: 6px; margin: 12px 0 0; }
+dl > div { display: flex; justify-content: space-between; gap: 12px; }
+dt { color: var(--muted); }
+dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+dd small { color: var(--muted); }
+.bad { color: var(--danger); }
+.big {
+  width: 100%; min-height: 120px; border-radius: 20px; font-size: 1.5rem; font-weight: 700;
+  border: none; background: var(--disabled-bg); color: var(--muted); transition: background .2s, transform .1s;
+}
+.big.ready { background: var(--accent); color: #fff; box-shadow: 0 6px 24px color-mix(in srgb, var(--accent) 45%, transparent); }
+.big.ready:active { transform: scale(.98); }
+.flash { text-align: center; color: var(--accent); font-weight: 600; margin: 0; }
+.mapwrap { position: relative; padding: 0; overflow: hidden; }
+.map { height: 320px; }
+.recenter { position: absolute; right: 10px; bottom: 10px; z-index: 500; }
+.log { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 4px; }
+.log li { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; font-size: .9rem; }
+.log small { color: var(--muted); }
+h2 { font-size: 1rem; margin: 0; }

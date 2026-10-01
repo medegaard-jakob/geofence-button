@@ -1,0 +1,91 @@
+@if (store.zones().length === 0) {
+  <div class="notice">
+    You have no area yet. <a routerLink="/zones">Draw one first →</a>
+  </div>
+}
+
+<section class="status card">
+  <div class="row">
+    <button class="secondary" (click)="toggleTracking()">
+      {{ loc.watching() ? 'Stop GPS' : 'Start GPS' }}
+    </button>
+    <button class="ghost" (click)="testBeep()" title="Play the beep">🔊 Test beep</button>
+  </div>
+
+  @if (loc.error(); as err) {
+    <p class="error">{{ err }}</p>
+  }
+
+  @if (loc.fix(); as f) {
+    <dl>
+      <div>
+        <dt>Accuracy</dt>
+        <dd [class.bad]="!accurateEnough()">
+          ±{{ f.accuracy | number: '1.0-0' }} m
+          <small>(need ≤ {{ store.settings().requiredAccuracy }} m)</small>
+        </dd>
+      </div>
+      @if (nearest(); as n) {
+        <div>
+          <dt>{{ n.dist >= 0 ? 'Inside' : 'Outside' }}</dt>
+          <dd>
+            {{ n.name }} —
+            {{ (n.dist >= 0 ? n.dist : -n.dist) | number: '1.0-0' }} m
+            {{ n.dist >= 0 ? 'from edge' : 'away' }}
+          </dd>
+        </div>
+      }
+      <div>
+        <dt>Last fix</dt>
+        <dd [class.bad]="!fresh()">{{ ageSeconds() }} s ago</dd>
+      </div>
+    </dl>
+  } @else if (loc.watching()) {
+    <p class="muted">Waiting for first GPS fix…</p>
+  } @else {
+    <p class="muted">Tap <b>Start GPS</b> and allow location access. Keep this screen open.</p>
+  }
+</section>
+
+<button class="big" [class.ready]="available()" [disabled]="!available()" (click)="press()">
+  @if (available()) {
+    Push the button
+  } @else if (!loc.watching()) {
+    GPS is off
+  } @else if (!fresh()) {
+    Waiting for GPS…
+  } @else if (!accurateEnough()) {
+    GPS not accurate enough
+  } @else {
+    Not inside an area
+  }
+</button>
+
+@if (flash(); as msg) {
+  <p class="flash">✓ {{ msg }}</p>
+}
+
+<div class="mapwrap card">
+  <div #map class="map"></div>
+  @if (!follow() && loc.fix()) {
+    <button class="recenter" (click)="follow.set(true)">⌖ Follow me</button>
+  }
+</div>
+
+@if (store.presses().length) {
+  <section class="card">
+    <div class="row between">
+      <h2>Presses</h2>
+      <button class="ghost small" (click)="store.clearPresses()">Clear</button>
+    </div>
+    <ul class="log">
+      @for (p of store.presses().slice(0, 20); track p.time) {
+        <li>
+          <span>{{ p.time | date: 'MMM d, HH:mm:ss' }}</span>
+          <span>{{ p.zone }}</span>
+          <small>±{{ p.accuracy | number: '1.0-0' }} m</small>
+        </li>
+      }
+    </ul>
+  </section>
+}

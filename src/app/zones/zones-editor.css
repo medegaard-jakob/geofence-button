@@ -1,0 +1,17 @@
+:host { display: flex; flex-direction: column; gap: 12px; }
+h2 { font-size: 1rem; margin: 0 0 8px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.zones { list-style: none; padding: 0; margin: 0 0 4px; display: grid; gap: 6px; }
+.zones li { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.zones li.editing { opacity: .5; }
+.zones small { color: var(--muted); }
+.actions { margin-left: auto; display: flex; gap: 4px; }
+.draft { border-color: #ea580c; }
+.hint { color: var(--muted); font-size: .9rem; margin: 8px 0; }
+.field { display: grid; gap: 4px; margin: 8px 0; }
+.field input:not([type=range]) { font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); }
+.check { display: flex; gap: 8px; align-items: flex-start; margin: 10px 0; }
+.check input { margin-top: 3px; }
+.mapcard { padding: 0; overflow: hidden; }
+.map { height: 420px; }
+.mapcard.drawing .map { cursor: crosshair; }

@@ -1,0 +1,84 @@
+<section class="card">
+  <h2>Your areas</h2>
+  @if (store.zones().length === 0 && !draft()) {
+    <p class="muted">No areas yet. Create one below.</p>
+  }
+  <ul class="zones">
+    @for (z of store.zones(); track z.id) {
+      <li [class.editing]="draft()?.id === z.id">
+        <button class="link" (click)="show(z)">{{ z.name }}</button>
+        <small>
+          {{ z.kind === 'circle' ? 'circle, ' + (z.radius | number: '1.0-0') + ' m' : z.points.length + ' corners' }}
+        </small>
+        <span class="actions">
+          <button class="ghost small" (click)="edit(z)" [disabled]="!!draft()">Edit</button>
+          <button class="ghost small danger" (click)="remove(z)">Delete</button>
+        </span>
+      </li>
+    }
+  </ul>
+  @if (!draft()) {
+    <div class="row">
+      <button (click)="newZone('polygon')">+ Draw shape</button>
+      <button class="secondary" (click)="newZone('circle')">+ Circle</button>
+    </div>
+  }
+</section>
+
+@if (draft(); as d) {
+  <section class="card draft">
+    <label class="field">
+      <span>Name</span>
+      <input [ngModel]="d.name" (ngModelChange)="patch({ name: $event })" />
+    </label>
+
+    @if (d.kind === 'polygon') {
+      <p class="hint">
+        Tap the map to add corners ({{ d.points.length }} so far, need at least 3).
+        Drag a corner to move it. Or walk the boundary and tap <b>Add my position</b> at each corner.
+      </p>
+    } @else {
+      <p class="hint">Tap the map to place the centre (drag it to move), then set the radius.</p>
+      <label class="field">
+        <span>Radius: {{ d.radius }} m</span>
+        <input type="range" min="5" max="500" step="1" [ngModel]="d.radius" (ngModelChange)="patch({ radius: +$event })" />
+      </label>
+    }
+
+    <div class="row">
+      <button class="secondary" (click)="addHere()">
+        📍 {{ loc.fix() ? 'Add my position' : 'Start GPS' }}
+        @if (loc.fix(); as f) { <small>(±{{ f.accuracy | number: '1.0-0' }} m)</small> }
+      </button>
+      <button class="ghost" (click)="undo()">Undo</button>
+    </div>
+    <div class="row">
+      <button (click)="save()" [disabled]="!canSave()">Save area</button>
+      <button class="ghost" (click)="draft.set(null)">Cancel</button>
+    </div>
+  </section>
+}
+
+<div class="card mapcard" [class.drawing]="!!draft()">
+  <div #map class="map"></div>
+</div>
+
+<section class="card">
+  <h2>Settings</h2>
+  <label class="field">
+    <span>Required GPS accuracy: ≤ {{ store.settings().requiredAccuracy }} m</span>
+    <input
+      type="range" min="3" max="50" step="1"
+      [ngModel]="store.settings().requiredAccuracy"
+      (ngModelChange)="store.updateSettings({ requiredAccuracy: +$event })"
+    />
+  </label>
+  <label class="check">
+    <input type="checkbox" [ngModel]="store.settings().strict" (ngModelChange)="store.updateSettings({ strict: $event })" />
+    <span>Strict: only enable when the whole GPS uncertainty circle is inside the area</span>
+  </label>
+  <label class="check">
+    <input type="checkbox" [ngModel]="store.settings().beep" (ngModelChange)="store.updateSettings({ beep: $event })" />
+    <span>Beep (and vibrate) when the button becomes available</span>
+  </label>
+</section>
